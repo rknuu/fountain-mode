@@ -2593,21 +2593,27 @@ Otherwise return `fountain-export-buffer'"
               str))))))
 
 (defun fountain-export-region (beg end format &optional snippet)
-  (let ((fountain-export-standalone
+  (let ((sourcebuf (current-buffer))
+        (fountain-export-standalone
          (unless snippet fountain-export-standalone))
-        (level fountain-outline-cycle))
+        (level fountain-outline-cycle)
+        content)
     (fountain-outline-hide-level 0 t)
     (unwind-protect
-        (save-excursion
-          (let ((content (fountain-parse-region beg end)))
-            (progress-reporter-done fountain-parse-job)
-            (fountain-export-format-element
-             content format
-             (cdr (or (assoc (or (plist-get (nth 1 content)
-                                            'format)
-                                 "screenplay")
-                             fountain-export-include-elements-alist)
-                      (car fountain-export-include-elements-alist))))))
+        (progn
+          (with-temp-buffer
+            (fountain-init-vars)
+            (insert-buffer-substring sourcebuf beg end)
+            (fountain-delete-comments-in-region (point-min) (point-max))
+            (setq content (fountain-parse-region (point-min) (point-max))))
+          (progress-reporter-done fountain-parse-job)
+          (fountain-export-format-element
+           content format
+           (cdr (or (assoc (or (plist-get (nth 1 content)
+                                          'format)
+                               "screenplay")
+                           fountain-export-include-elements-alist)
+                    (car fountain-export-include-elements-alist)))))
       (progress-reporter-done fountain-export-job)
       (fountain-outline-hide-level level t))))
 
