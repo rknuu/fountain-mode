@@ -2895,8 +2895,8 @@ then make the changes desired."
                                       fountain-continued-dialog-string
                                       "$")))
                        (fountain-character-p)
-                       (s-equals? (fountain-get-character 0)
-                                  (fountain-get-character -1 'scene)))
+                       (string= (fountain-get-character 0)
+                                (fountain-get-character -1 'scene)))
               (re-search-forward "\s*$" (line-end-position) t)
               (replace-match (concat "\s" fountain-continued-dialog-string)))
             (forward-line 1)
