@@ -2449,7 +2449,7 @@ data reflects `outline-regexp'."
     (list 'action
           (list 'begin beg
                 'end end)
-          (s-trim-right (buffer-substring-no-properties beg end)))))
+          (buffer-substring-no-properties beg end)))) ; FIXME strip whitespace?
 
 (defun fountain-parse-element ()
   (cond
